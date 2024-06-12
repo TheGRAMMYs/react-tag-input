@@ -9,14 +9,6 @@ export const KEYS = {
   COMMA: 188,
 };
 
-export const SEPARATORS = {
-  ENTER: 'Enter',
-  TAB: 'Tab',
-  COMMA: ',',
-  SPACE: ' ',
-  SEMICOLON: ';',
-};
-
 export const DEFAULT_PLACEHOLDER = 'Press enter to add new tag';
 
 export const DEFAULT_LABEL_FIELD = 'text';

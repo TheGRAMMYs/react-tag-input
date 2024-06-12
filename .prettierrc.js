@@ -7,5 +7,5 @@ module.exports = {
   trailingComma: 'es5',
   jsxBracketSameLine: true,
   arrowParens: 'always',
-  parser: 'typescript',
+  parser: 'flow',
 };

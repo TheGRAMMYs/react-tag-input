@@ -1,10 +1,7 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
-
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
-  preset: 'ts-jest',
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -39,37 +36,19 @@ module.exports = {
 
   // An object that configures minimum threshold enforcement for coverage results
   coverageThreshold: {
-    './src/components/ClearAllTags.tsx': {
+    './src/components/Tag.js': {
       branches: 100,
       functions: 100,
       lines: 100,
       statements: 100,
     },
-    './src/components/Suggestions.tsx': {
-      branches: 90,
-      functions: 100,
-      lines: 95,
-      statements: 95,
-    },
-    './src/components/RemoveComponent.tsx': {
+    './src/components/utils.js': {
       branches: 100,
       functions: 100,
       lines: 100,
       statements: 100,
     },
-    './src/components/SingleTag.tsx': {
-      branches: 70,
-      functions: 100,
-      lines: 100,
-      statements: 100,
-    },
-    './src/components/utils.ts': {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100,
-    },
-    './src/components/constants.ts': {
+    './src/components/constants.js': {
       branches: 100,
       functions: 100,
       lines: 100,
@@ -98,12 +77,11 @@ module.exports = {
   // ],
 
   // An array of file extensions your modules use
-  moduleFileExtensions: ['js', 'ts', 'tsx'],
+  moduleFileExtensions: ['js'],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
     '\\.(sa|sc|c)ss$': '<rootDir>/__tests__/__mocks__/styleMock.js',
-    "^lodash-es$": "lodash"
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -151,10 +129,10 @@ module.exports = {
   // setupFiles: [],
 
   // The path to a module that runs some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ['<rootDir>/__tests__/setupTest.ts'],
+  setupFilesAfterEnv: ['<rootDir>/__tests__/setupTest.js'],
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
-  snapshotSerializers: [],
+  snapshotSerializers: ['enzyme-to-json/serializer'],
 
   // The test environment that will be used for testing
   testEnvironment: 'jsdom',
@@ -166,11 +144,14 @@ module.exports = {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  testMatch: ['**/__tests__/**/*.test.(ts|tsx|js)'],
+  // testMatch: [
+  //   "**/__tests__/**/*.js?(x)",
+  //   "**/?(*.)+(spec|test).js?(x)"
+  // ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   testPathIgnorePatterns: [
-    '<rootDir>/__tests__/setupTest.ts',
+    '<rootDir>/__tests__/setupTest.js',
     '<rootDir>/__tests__/__mocks__/',
   ],
 
@@ -190,14 +171,7 @@ module.exports = {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        isolatedModules: true,
-      },
-    ],
-  },
+  // transform: null
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: ['/node_modules/'],

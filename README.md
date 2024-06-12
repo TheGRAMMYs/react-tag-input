@@ -3,9 +3,7 @@
 [![MIT](https://img.shields.io/npm/l/react-tag-input.svg?style=flat-square)](https://github.com/react-tags/react-tags/blob/master/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/react-tag-input.svg?style=flat-square)](https://www.npmjs.com/package/react-tag-input)
 [![npm downloads](https://img.shields.io/npm/dm/react-tag-input.svg?style=flat-square)](https://www.npmjs.com/package/react-tag-input)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-[![Support on Github Sponsors](https://img.shields.io/badge/GitHub-❤️-99e9f2.svg?logo=github&label=Sponsor)](https://github.com/sponsors/ad1992)
-
+[![Build Status](https://travis-ci.com/react-tags/react-tags.svg?branch=master)](https://travis-ci.com/react-tags/react-tags)[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 React-tags is a simple tagging component ready to drop in your projects. The component is inspired by GMail's *To* field in the compose window.
 
@@ -27,7 +25,7 @@ Because I was looking for an excuse to build a standalone component and publish 
 ## Demo
 ![img](demo.gif)
 
-Check it out [here](https://codesandbox.io/p/sandbox/react-tags-l65545)
+Check it out [here](https://stackblitz.com/edit/react-tag-input-1nelrc)
 
 
 ## Installation
@@ -42,14 +40,15 @@ or via Yarn
 ```js
 yarn add react-tag-input
 ```
-make sure you have installed the **peer dependencies** as well with :point_down: versions
+make sure you have installed the **peer dependencies** as well with below versions
+```
+"react": "^17.0.2",
+"react-dnd": "^14.0.2",
+"react-dnd-html5-backend": "^14.0.0",
+"react-dom": "17.0.2"
 
 ```
- "react": "^18.2.0",
- "react-dnd": "^14.0.2",
- "react-dnd-html5-backend": "^14.0.0",
- "react-dom": "^18.2.0"
-```
+It is, however, also available to be used separately (`dist/ReactTags.min.js`). If you prefer this method remember to include [ReactDND](https://github.com/gaearon/react-dnd) as a dependancy. Refer to the [example](https://stackblitz.com/edit/react-tag-input) to see how this works.
 
 ## Usage
     
@@ -57,53 +56,43 @@ Here's a sample implementation that initializes the component with a list of ini
 
 
 ```javascript
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { StrictMode } from 'react';
-import GitHubCorner from './GithubCorner';
-import type { Tag } from '../src/components/SingleTag';
-import { WithContext as ReactTags, SEPARATORS } from '../src/index';
-;
+import React, { useState } from 'react';
+import { render } from 'react-dom';
+import { COUNTRIES } from './countries';
+import './style.css';
+import { WithContext as ReactTags } from 'react-tag-input';
 
-const suggestions = COUNTRIES.map((country) => {
+const suggestions = COUNTRIES.map(country => {
   return {
     id: country,
-    text: country,
-    className: '',
+    text: country
   };
 });
 
 const KeyCodes = {
   comma: 188,
-  enter: [10, 13],
+  enter: 13
 };
 
+const delimiters = [KeyCodes.comma, KeyCodes.enter];
 
 const App = () => {
-  const [tags, setTags] = React.useState<Array<Tag>>([
-    { id: 'Thailand', text: 'Thailand', className: '' },
-    { id: 'India', text: 'India', className: '' },
-    { id: 'Vietnam', text: 'Vietnam', className: '' },
-    { id: 'Turkey', text: 'Turkey', className: '' },
+  const [tags, setTags] = React.useState([
+    { id: 'Thailand', text: 'Thailand' },
+    { id: 'India', text: 'India' },
+    { id: 'Vietnam', text: 'Vietnam' },
+    { id: 'Turkey', text: 'Turkey' }
   ]);
 
-  const handleDelete = (index: number) => {
-    setTags(tags.filter((_, i) => i !== index));
+  const handleDelete = i => {
+    setTags(tags.filter((tag, index) => index !== i));
   };
 
-  const onTagUpdate = (index: number, newTag: Tag) => {
-    const updatedTags = [...tags];
-    updatedTags.splice(index, 1, newTag);
-    setTags(updatedTags);
+  const handleAddition = tag => {
+    setTags([...tags, tag]);
   };
 
-  const handleAddition = (tag: Tag) => {
-    setTags((prevTags) => {
-      return [...prevTags, tag];
-    });
-  };
-
-  const handleDrag = (tag: Tag, currPos: number, newPos: number) => {
+  const handleDrag = (tag, currPos, newPos) => {
     const newTags = tags.slice();
 
     newTags.splice(currPos, 1);
@@ -113,48 +102,31 @@ const App = () => {
     setTags(newTags);
   };
 
-  const handleTagClick = (index: number) => {
+  const handleTagClick = index => {
     console.log('The tag at index ' + index + ' was clicked');
-  };
-
-  const onClearAll = () => {
-    setTags([]);
   };
 
   return (
     <div className="app">
-      <GitHubCorner />
-
       <h1> React Tags Example </h1>
       <div>
         <ReactTags
           tags={tags}
           suggestions={suggestions}
-          separators={[SEPARATORS.ENTER, SEPARATORS.COMMA]}
+          delimiters={delimiters}
           handleDelete={handleDelete}
           handleAddition={handleAddition}
           handleDrag={handleDrag}
           handleTagClick={handleTagClick}
-          onTagUpdate={onTagUpdate}
           inputFieldPosition="bottom"
-          editable
-          clearAll
-          onClearAll={onClearAll}
-          maxTags={7}
+          autocomplete
         />
       </div>
     </div>
   );
 };
-const domNode = document.getElementById('app')!;
-const root = createRoot(domNode);
 
-root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
-
+render(<App />, document.getElementById('root'));
 
 ```
 
@@ -173,8 +145,7 @@ Option | Type | Default | Description
 --- | --- | --- | ---
 |[`tags`](#tags) | `Array` | `[]` | An array of tags that are displayed as pre-selected.|
 |[`suggestions`](#suggestions) | `Array` | `[]` | An array of suggestions that are used as basis for showing suggestions.
-|[`delimiters`](#delimiters) | `Array` | `[13, 9]` | Specifies which characters keycode should terminate tags input. `[Deprecated]`, use [`separators`](#separators) instead.
-|[`separators`](#separators) | `Array` | `["Enter", "Tab"]` | Specifies which characters should terminate tags input |
+|[`delimiters`](#delimiters) | `Array` | `[ENTER, TAB]` | Specifies which characters should terminate tags input.
 |[`placeholder`](#placeholder) | `String` | `Add new tag` | The placeholder shown for the input.
 |[`labelField`](#labelField) | `String` | `text` | Provide an alternative `label` property for the tags.
 |[`handleAddition`](#handleAddition) | `Function` | `undefined` | Function called when the user wants to add a tag (required).
@@ -182,20 +153,19 @@ Option | Type | Default | Description
 |[`handleDrag`](#handleDrag) | `Function` | `undefined` | Function called when the user drags a tag.
 |[`handleFilterSuggestions`](#handleFilterSuggestions) | `Function` | `undefined` | Function called when filtering suggestions.
 |[`handleTagClick`](#handleTagClick) | `Function` | `undefined` | Function called when the user wants to know which tag was clicked.
-|[`autofocus`](#autofocus) | `Boolean` | `true` | Boolean value to control whether the text-input should be autofocused on mount. `[Deprecated]`, use [`autoFocus`](#autoFocus) instead.
-|[`autoFocus`](#autoFocus) | `Boolean` | `true` | Boolean value to control whether the text-input should be autofocused on mount.
+|[`autofocus`](#autofocus) | `Boolean` | `true` | Boolean value to control whether the text-input should be autofocused on mount.
 |[`allowDeleteFromEmptyInput`](#allowDeleteFromEmptyInput) | `Boolean` | `true` | Boolean value to control whether tags should be deleted when the 'Delete' key is pressed in an empty Input Box.
 |[`handleInputChange`](#handleInputChange) | `Function` | `undefined` | Event handler for input onChange.
 |[`handleInputFocus`](#handleInputFocus) | `Function` | `undefined` | Event handler for input onFocus.
 |[`handleInputBlur`](#handleInputBlur) | `Function` | `undefined` | Event handler for input onBlur.
 |[`minQueryLength`](#minQueryLength) | `Number` | `2` | How many characters are needed for suggestions to appear.
 |[`removeComponent`](#removeComponent) | `Function` |  | Function to render custom remove component for the tags.
-|[`autocomplete`](#autocomplete) | `Boolean`/`Number` | `false` | Ensure the first matching suggestion is automatically converted to a tag when a [separator](#separator) key is pressed.`[Deprecated]` and will be removed in v7.x.x, more info in [#949](https://github.com/react-tags/react-tags/issues/949)
+|[`autocomplete`](#autocomplete) | `Boolean`/`Number` | `false` | Ensure the first matching suggestion is automatically converted to a tag when a [delimiter](#delimiters) key is pressed.
 |[`readOnly`](#readOnly) | `Boolean` | `false` | Read-only mode without the input box and `removeComponent` and drag-n-drop features disabled.
 |[`name`](#name) | `String` | `undefined` | The `name` attribute added to the input.
 |[`id`](#id) | `String` | `undefined` | The `id` attribute added to the input.
 |[`maxLength`](#maxLength) | `Number` | `Infinity` | The `maxLength` attribute added to the input.
-|[`inline`](#inline) | `Boolean` | `true` | Render input field and selected tags in-line. `[Deprecated]`, use [`inputFieldPosition`](#inputFieldPosition) instead.
+|[`inline`](#inline) | `Boolean` | `true` | Render input field and selected tags in-line.
 |[`inputFieldPosition`](#inputFieldPosition) | `String` | `inline` | Specify position of input field relative to tags
 |[`allowUnique`](#allowUnique) | `Boolean` | `true` | Boolean value to control whether tags should be unqiue.
 |[`allowDragDrop`](#allowDragDrop) | `Boolean` | `true` | Implies whether tags should have drag-n-drop features enabled.
@@ -207,90 +177,6 @@ Option | Type | Default | Description
 |[`clearAll`](#clearAll) | `boolean` | `false` | Implies whether 'clear all' button should be shown.
 |[`onClearAll`](#onClearAll) | `Function` |  | This callback if present is triggered when clear all button is clicked.
 | [`maxTags`](#maxTags) | `number` | | The maximum count of tags to be added
-
-## Styling
-`<ReactTags>` does not come up with any styles. However, it is very easy to customize the look of the component the way you want it. By default, the component provides the following classes with which you can style -
-
-- `ReactTags__tags`
-- `ReactTags__tagInput`
-- `ReactTags__tagInputField`
-- `ReactTags__selected`
-- `ReactTags__selected ReactTags__tag`
-- `ReactTags__selected ReactTags__remove`
-- `ReactTags__suggestions`
-- `ReactTags__activeSuggestion`
-- `ReactTags__editTagInput`
-- `ReactTags__editTagInputField`
-- `ReactTags__clearAll`
-
-An example can be found in [`/example/reactTags.css`](https://github.com/react-tags/react-tags/blob/master/example/reactTags.css).
-
-If you need to set your own class names on the component, you may pass in
-a `classNames` prop.
-
-```js
-  <ReactTags
-    classNames={{
-      tags: 'tagsClass',
-      tagInput: 'tagInputClass',
-      tagInputField: 'tagInputFieldClass',
-      selected: 'selectedClass',
-      tag: 'tagClass',
-      remove: 'removeClass',
-      suggestions: 'suggestionsClass',
-      activeSuggestion: 'activeSuggestionClass',
-      editTagInput: 'editTagInputClass',
-      editTagInputField: 'editTagInputField',
-      clearAll: 'clearAllClass',
-    }}
-    ...>
-```
-## Preparing for Migration to v7.x.x
-
-Below are the list of `deprecated` props so please stop using it and migrate to the new props as these will be removed in `v7.x.x`.
-You will see a warning for the migration as well in the console.
-
-- `delimiters` - Please use [`separators`](#separators) instead, more info in [this issue](https://github.com/react-tags/react-tags/issues/960).
-- `inline` - Please use [`inputFieldPosition`](#inputFieldPosition) instead.
-- `autofocus` - Please use [`autoFocus`](#autoFocus) instead.
-
-Additionally the prop `autocomplete` is deprecated and will be removed in `v7.x.x`. If you have any concerns regarding this, please share your thoughts in [this issue](https://github.com/react-tags/react-tags/issues/949).
-
-
-## Support
-If you like this library, please support it to contribute to its development :)
-
-[![Github-sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ad1992)
-
-
-## Dev
-The component is written in ES6 and uses [Webpack](http://webpack.github.io/) as its build tool.
-
-## Set up instructions
-
-```
-git clone git@github.com:react-tags/react-tags.git
-cd react-tags
-npm install
-npm run precommit
-npm run start
-```
-open [http://localhost:8090/example](http://localhost:8090/example)
-
-
-## Contributing
-Got ideas on how to make this better? Open an issue!
-
-
-## Thanks
-The autocomplete dropdown is inspired by Lea Verou's [awesomeplete](https://github.com/LeaVerou/awesomplete) library. The Drag and drop functionality is provided by Dan Abramov's insanely useful [ReactDND](https://github.com/gaearon/react-dnd) library.
-
-Also thanks to the awesome contributors who've made the library far better!
-
-
-[default-suggestions-filter-logic]: https://github.com/react-tags/react-tags/blob/v4.0.1/lib/ReactTags.js#L83
-[includes-polyfill]: https://github.com/mathiasbynens/String.prototype.includes
-
 
 ### tags 
 An array of tags that are displayed as pre-selected. Each tag should have an `id` property, property for the label, which is specified by the [`labelField`](#labelFieldOption) and class for label, which is specified by `className`.
@@ -320,34 +206,16 @@ const suggestions = [
 ```
 
 ### delimiters
-This prop is deprecated and will be removed in 7.x.x. Please use [`separators`](#separators) instead.
-Specifies which characters should terminate tags input. An array of character codes. We export the constant `KEYS` for convenience. 
-
+Specifies which characters should terminate tags input. An array of character codes.
 
 ```js
-import { WithContext as ReactTags, KEYS } from 'react-tag-input';
-
+const Keys = {
+    TAB: 9,
+    SPACE: 32,
+    COMMA: 188,
+};
 <ReactTags
-    delimiters={[KEYS.TAB, KEYS.SPACE, KEYS.COMMA]}
- />
-```
-
-### separators
-Specifies which characters should separate tags. An array of strings. We support the below separators :point_down:
-
-- `Enter`
-- `Tab`
-- `Space`
-- `Comma`
-- `Semicolon`
-
-And we export the constant `SEPERATORS` for convenience. 
-
-
-```js
-import { WithContext as ReactTags, SEPARATORS } from 'react-tag-input';
-<ReactTags
-    separators={[SEPARATORS.TAB, SEPARATORS.SPACE, SEPARATORS.COMMA]}
+    delimiters={[Keys.TAB, Keys.SPACE, Keys.COMMA]}
  />
 ```
 
@@ -433,7 +301,6 @@ function(i) {
 
 ### autofocus
 Optional boolean param to control whether the text-input should be autofocused on mount.
-This prop is `deprecated` and will be removed in 7.x.x, please use `autoFocus` instead.
 
 ```jsx
 <ReactTags
@@ -441,25 +308,12 @@ This prop is `deprecated` and will be removed in 7.x.x, please use `autoFocus` i
     ...>
 ```
 
-### autoFocus
-Optional boolean param to control whether the text-input should be autofocused on mount.
-
-```jsx
-<ReactTags
-    autoFocus={false}
-    ...>
-```
-
 ### allowDeleteFromEmptyInput
-Optional boolean param to control whether tags should be deleted when the `Backspace` key is pressed in an empty Input Box. By default this prop is `false`. 
-
-However when input field position is `inline`, you will be able to delete the tags by pressing `Backspace` irrespective of the value of this prop.
-
-This prop will likely be removed in future versions.
+Optional boolean param to control whether tags should be deleted when the 'Delete' key is pressed in an empty Input Box.
 
 ```js
 <ReactTags
-    allowDeleteFromEmptyInput={true}
+    allowDeleteFromEmptyInput={false}
     ...>
 ```
 ### handleInputChange
@@ -550,13 +404,11 @@ The below props will be passed to the `removeComponent`. You will need to forwar
 
 
 ### autocomplete
-This prop is deprecated and will be removed in 7.x.x to simplify the integration and make it more intutive. If you have any concerns regarding this, please share your thoughts in https://github.com/react-tags/react-tags/issues/949.
+Useful for enhancing data entry workflows for your users by ensuring the first matching suggestion is automatically converted to a tag when a [delimiter](#delimiters) key is pressed (such as the enter key). This option has three possible values:
 
-Useful for enhancing data entry workflows for your users by ensuring the first matching suggestion is automatically converted to a tag when a [separator](#separators) key is pressed (such as the enter key). This option has three possible values:
-
-- `true` - when separator key (such as enter) is pressed, first matching suggestion is used.
-- `1` - when separator key (such as enter) is pressed, matching suggestion is used only if there is a single matching suggestion
-- `false` (default) - tags are not autocompleted on enter/separator key press.
+- `true` - when delimeter key (such as enter) is pressed, first matching suggestion is used.
+- `1` - when delimeter key (such as enter) is pressed, matching suggestion is used only if there is a single matching suggestion
+- `false` (default) - tags are not autocompleted on enter/delimiter
 
 This option has no effect if there are no [`suggestions`](#suggestionsOption).
 
@@ -684,14 +536,85 @@ onTagUpdate(editIndex, tag) => void;
 ```
 This callback is if present is triggered when tag is updated. The edit index and the tag are passed in the callback. You can update the [`tags`](#tags) prop in this callback.
 
-### clearAll
+#### clearAll
 
 This props implies whether 'clear all' button should be shown. Defaults to `false`.
 
 
-### onClearAll
+#### onClearAll
 This callback is if present is triggered when "clear all" button is clicked. You can set the [`tags`](#tags) prop to empty in this callback.
 
-### maxTags
+#### maxTags
 This prop specifies the maximum count of tags to be added. Incase the tags exceed, error will show up to convey the maximum tag limit has reached.
 
+## Styling
+`<ReactTags>` does not come up with any styles. However, it is very easy to customize the look of the component the way you want it. By default, the component provides the following classes with which you can style -
+
+- `ReactTags__tags`
+- `ReactTags__tagInput`
+- `ReactTags__tagInputField`
+- `ReactTags__selected`
+- `ReactTags__selected ReactTags__tag`
+- `ReactTags__selected ReactTags__remove`
+- `ReactTags__suggestions`
+- `ReactTags__activeSuggestion`
+- `ReactTags__editTagInput`
+- `ReactTags__editTagInputField`
+- `ReactTags__clearAll`
+
+An example can be found in [`/example/reactTags.css`](https://github.com/react-tags/react-tags/blob/master/example/reactTags.css).
+
+If you need to set your own class names on the component, you may pass in
+a `classNames` prop.
+
+```js
+  <ReactTags
+    classNames={{
+      tags: 'tagsClass',
+      tagInput: 'tagInputClass',
+      tagInputField: 'tagInputFieldClass',
+      selected: 'selectedClass',
+      tag: 'tagClass',
+      remove: 'removeClass',
+      suggestions: 'suggestionsClass',
+      activeSuggestion: 'activeSuggestionClass',
+      editTagInput: 'editTagInputClass',
+      editTagInputField: 'editTagInputField',
+      clearAll: 'clearAllClass',
+    }}
+    ...>
+```
+
+## Support
+If you like this library, you can support to help it improve:)
+
+[![Github-sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ad1992)
+
+
+## Dev
+The component is written in ES6 and uses [Webpack](http://webpack.github.io/) as its build tool.
+
+## Set up instructions
+
+```
+git clone git@github.com:react-tags/react-tags.git
+cd react-tags
+npm install
+npm run precommit
+npm run start
+```
+open [http://localhost:8090/example](http://localhost:8090/example)
+
+
+## Contributing
+Got ideas on how to make this better? Open an issue!
+
+
+## Thanks
+The autocomplete dropdown is inspired by Lea Verou's [awesomeplete](https://github.com/LeaVerou/awesomplete) library. The Drag and drop functionality is provided by Dan Abramov's insanely useful [ReactDND](https://github.com/gaearon/react-dnd) library.
+
+Also thanks to the awesome contributors who've made the library far better!
+
+
+[default-suggestions-filter-logic]: https://github.com/react-tags/react-tags/blob/v4.0.1/lib/ReactTags.js#L83
+[includes-polyfill]: https://github.com/mathiasbynens/String.prototype.includes

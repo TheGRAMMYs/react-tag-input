@@ -1,5 +1,4 @@
-import { escapeRegExp } from 'lodash-es';
-import { SEPARATORS } from './constants';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 /**
  * Convert an array of delimiter characters into a regular expression
@@ -7,36 +6,16 @@ import { SEPARATORS } from './constants';
  * @param {Array<char>} delimiters Array of characters to turn into a regex
  * @returns {RegExp} Regular expression
  */
-export function buildRegExpFromDelimiters(delimiters: Array<number>): RegExp {
+export function buildRegExpFromDelimiters(delimiters) {
   const delimiterChars = delimiters
     .map((delimiter) => {
       // See: http://stackoverflow.com/a/34711175/1463681
       const chrCode = delimiter - 48 * Math.floor(delimiter / 48);
-      return String.fromCharCode(96 <= delimiter ? chrCode : delimiter);
+      return String.fromCharCode(delimiter >= 96 ? chrCode : delimiter);
     })
     .join('');
   const escapedDelimiterChars = escapeRegExp(delimiterChars);
   return new RegExp(`[${escapedDelimiterChars}]+`);
-}
-
-export function getKeyCodeFromSeparator(separator: string) {
-  switch (separator) {
-    case SEPARATORS.ENTER:
-      // 13 is for enter key and 10 is for carriage return, this might be present when pasting from excel
-      return [10, 13];
-    case SEPARATORS.TAB:
-      return 9;
-    case SEPARATORS.COMMA:
-      return 188;
-    case SEPARATORS.SPACE:
-      return 32;
-    case SEPARATORS.SEMICOLON:
-      return 186;
-    // Ideally this should never happen but just in case
-    // return 0 (Unidentified key)
-    default:
-      return 0;
-  }
 }
 
 /**
@@ -45,11 +24,7 @@ export function getKeyCodeFromSeparator(separator: string) {
  * @returns {boolean} true/false
  * The three different properties which controls this function are moveTag, readOnly and allowDragDrop.
  */
-export function canDrag(params: {
-  moveTag?: (dragIndex: number, hoverIndex: number) => void;
-  readOnly: boolean;
-  allowDragDrop: boolean;
-}): boolean {
+export function canDrag(params) {
   const { moveTag, readOnly, allowDragDrop } = params;
   return moveTag !== undefined && !readOnly && allowDragDrop;
 }
@@ -60,10 +35,7 @@ export function canDrag(params: {
  * @returns {boolean} true/false
  * The two different properties which controls this function are readOnly and allowDragDrop.
  */
-export function canDrop(params: {
-  readOnly: boolean;
-  allowDragDrop: boolean;
-}): boolean {
+export function canDrop(params) {
   const { readOnly, allowDragDrop } = params;
   return !readOnly && allowDragDrop;
 }
